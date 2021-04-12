@@ -1,11 +1,11 @@
 #========================================================================================================================
 # https://github.com/ophub/op
-# Description: Automatically Build OpenWrt for NanoPi R4S-1GB
-# Function: Workflows for Build NanoPi R4S-1GB
+# Description: Automatically Build OpenWrt for NanoPi R4S
+# Function: Workflows for Build NanoPi R4S
 # Cron: min (0 - 59) / hour (0 - 23) / day of month (1 - 31) / month (1 - 12) / day of week (0 - 6)(Sunday - Saturday)
 #========================================================================================================================
 
-name: Build OpenWrt for NanoPi R4S-1GB
+name: Build OpenWrt for NanoPi R4S
 
 on:
   repository_dispatch:
@@ -19,8 +19,8 @@ on:
     #branches:
       #- main
     #paths:
-      #- 'router/nanopi_r4s/.config-1gb'
-      #- '.github/workflows/build-openwrt-nanopi_r4s-1gb.yml'
+      #- 'router/nanopi_r4s/.config'
+      #- '.github/workflows/build-openwrt-nanopi_r4s.yml'
   schedule:
     - cron: '0 17 * * *'
 
@@ -28,15 +28,15 @@ env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: router/nanopi_r4s/feeds.conf.default
-  CONFIG_FILE: router/nanopi_r4s/.config-1gb
+  CONFIG_FILE: router/nanopi_r4s/.config
   DIY_P1_SH: router/nanopi_r4s/diy-part1.sh
   DIY_P2_SH: router/nanopi_r4s/diy-part2.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
   UPLOAD_COWTRANSFER: false
-  UPLOAD_WETRANSFER: true
-  RECENT_LASTEST: 15
+  UPLOAD_WETRANSFER: false
+  RECENT_LASTEST: 3
   TZ: Asia/Shanghai
 
 jobs:
@@ -60,6 +60,7 @@ jobs:
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
+        echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
 
     - name: Clone source code
       working-directory: /workdir
@@ -177,6 +178,4 @@ jobs:
           Default password: password
           Default WIFI name: OpenWrt
           Default WIFI password: none
-          [WETRANSFER](${{ env.WET_URL }})
-
 

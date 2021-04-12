@@ -1,25 +1,33 @@
 # OpenWrt for Phicomm-N1
 
-You can download the OpwnWrt for Phicomm-N1 firmware from [Releases](https://github.com/ophub/op/releases). Such as `openwrt_phicomm-n1_${date}`. Then write the IMG file to the USB hard disk through software such as [balenaEtcher](https://www.balena.io/etcher/).
+You can download the OpwnWrt for Phicomm-N1 firmware from [Releases](https://github.com/ophub/op/releases). Such as `openwrt_s905d_v${kernel}_${date}`. Then write the IMG file to the USB hard disk through software such as [Rufus](https://rufus.ie/) or [balenaEtcher](https://www.balena.io/etcher/).
 
-This OpenWrt firmware on the `Github Actions` to packaging was using ***`Flippy's`*** [Amlogic S9xxx Kernel for OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt), and the [Installation and Update scripts](https://github.com/ophub/amlogic-s9xxx-openwrt/tree/main/install-program), etc. Special thanks The maker `Flippy`.
-
-Welcome to use `forks` for personalized OpenWrt firmware configuration. If you like it, Please click the `stars`.
+This OpenWrt firmware on the `Github Actions` to packaging was using ***`Flippy's`*** [Amlogic S9xxx Kernel for OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt), and the [Install and Upgrade scripts](https://github.com/ophub/amlogic-s9xxx-openwrt/tree/main/amlogic-s9xxx/install-program), etc. Welcome to use `Fork` for [personalized OpenWrt firmware configuration](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/router-config/README.md). If you like it, Please click the `Star`.
 
 ## Firmware instructions
 
-- `n1-v*-openwrt_*.img`: For Phicomm-N1.
+- `openwrt_s905d-v*.img`: For Phicomm-N1.
 
-## Install to emmc partition or upgrade instructions
+## Install to EMMC partition and upgrade instructions
 
-Insert the `USB hard disk` with the written `OpenWrt` firmware. Log in to the default IP: 192.168.1.1 → `Login in to openwrt` → `system menu` → `TTYD terminal` → input command: 
+Choose the corresponding firmware according to your box. Then write the IMG file to the USB hard disk through software such as [balenaEtcher](https://www.balena.io/etcher/). Insert the USB hard disk into the Amlogic S9xxx STB. Common for all `s9xxx-Boxes`.
+
+***`Install OpenWrt`***
+
+- Log in to the default IP: 192.168.1.1 → `Login in to openwrt` → `system menu` → `TTYD terminal` → input command: 
 
 ```yaml
-n1-install.sh
-reboot
+openwrt-install
+```
+***`Upgrade OpenWrt`***
+
+- Log in to the default IP: 192.168.1.1 →  `Login in to openwrt` → `system menu` → `file transfer` → upload ***`openwrt*.img.gz (Support suffix: *.img.xz, *.img.gz, *.7z, *.zip)`*** to ***`/tmp/upload/`***, enter the `system menu` → `TTYD terminal` → input command: 
+
+```yaml
+openwrt-update
 ```
 
-[For more instructions please see: install-program](https://github.com/ophub/amlogic-s9xxx-openwrt/tree/main/install-program).
+[For more instructions please see: install-program](https://github.com/ophub/amlogic-s9xxx-openwrt/tree/main/amlogic-s9xxx/install-program)
 
 
 ## Compilation method
@@ -62,7 +70,7 @@ reboot
 | Option | Value |
 | ---- | ---- |
 | Target System | QEMU ARM Virtual Machine |
-| Subtarget | ARMv8 multiplatform |
+| Subtarget | QEMU ARMv8 Virtual Machine(cortex-a53) |
 | Target Profile | Default |
 | Target Images | squashfs |
 | LuCI -> Applications | in the file: .config |

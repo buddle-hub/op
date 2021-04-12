@@ -1,5 +1,3 @@
-![OPhub logo](/logo.svg)
-
 # OpenWrt Firmware
 
 The latest version of the OpenWrt firmware can be downloaded in [Releases](https://github.com/ophub/op/releases). For detailed information about each firmware, please refer to the README.md file of each model. The currently supported router models are: 
@@ -10,7 +8,7 @@ The latest version of the OpenWrt firmware can be downloaded in [Releases](https
 - [NanoPi_R4S](https://github.com/ophub/op/tree/master/router/nanopi_r4s)
 - [NanoPi_R2S](https://github.com/ophub/op/tree/master/router/nanopi_r2s)
 - [Phicomm_N1](https://github.com/ophub/op/tree/master/router/phicomm_n1)
-- [S9xxx_Boxs](https://github.com/ophub/op/tree/master/router/s9xxx)
+- [Amlogic_S9xxx_STB](https://github.com/ophub/op/tree/master/router/s9xxx)
 - [X86_64](https://github.com/ophub/op/tree/master/router/x86_64)
 
 ## Compilation method
@@ -80,10 +78,9 @@ On the [Action](https://github.com/ophub/op/actions) page. Select ***`Build Open
  │       ├── build-openwrt-linksys_wrt3200acm.yml      # Build Linksys WRT3200ACM firmware
  │       ├── build-openwrt-linksys_wrt32x.yml          # Build Linksys WRT32X firmware
  │       ├── build-openwrt-x86_64.yml                  # Build X86_64 Virtual Machine firmware
- │       ├── build-openwrt-s905x3.yml                  # Build S905x3 firmware
+ │       ├── build-openwrt-s9xxx.yml                   # Build S9xxx-Boxes firmware
  │       ├── build-openwrt-phicomm_n1.yml              # Build Phicomm-N1 firmware
- │       ├── build-openwrt-nanopi_r4s-1gb.yml          # Build NanoPi-R4S-1GB firmware
- │       ├── build-openwrt-nanopi_r4s-4gb.yml          # Build NanoPi-R4S-4GB firmware
+ │       ├── build-openwrt-nanopi_r4s.yml              # Build NanoPi-R4S firmware
  │       ├── build-openwrt-nanopi_r2s.yml              # Build NanoPi-R2S firmware
  │       └── delete-older-releases-artifacts.yml       # Delete older releases & artifacts
  │
@@ -107,8 +104,7 @@ On the [Action](https://github.com/ophub/op/actions) page. Select ***`Build Open
  │   │   └── README.md
  │   │ 
  │   ├── nanopi_r4s                                    # NanoPi R4S related code files
- │   │   ├── .config-1gb
- │   │   ├── .config-4gb
+ │   │   ├── .config
  │   │   ├── diy-part1.sh
  │   │   ├── diy-part2.sh
  │   │   └── README.md
@@ -131,7 +127,7 @@ On the [Action](https://github.com/ophub/op/actions) page. Select ***`Build Open
  │   │   ├── diy-part2.sh
  │   │   └── README.md
  │   │
- │   └── s9xxx                                         # S9xxx-Boxs related code files
+ │   └── s9xxx                                         # Amlogic S9xxx STB related code files
  │       ├── .config
  │       ├── diy-part1.sh
  │       ├── diy-part2.sh

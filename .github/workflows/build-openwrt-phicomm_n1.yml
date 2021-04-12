@@ -1,7 +1,7 @@
 #========================================================================================================================
 # https://github.com/ophub/op
 # Description: Automatically Build OpenWrt for Phicomm-N1
-# Function: Workflows for Build Phicomm-N1
+# Function: Workflows for Build OpenWrt for Phicomm-N1
 # Cron: min (0 - 59) / hour (0 - 23) / day of month (1 - 31) / month (1 - 12) / day of week (0 - 6)(Sunday - Saturday)
 #========================================================================================================================
 
@@ -26,11 +26,12 @@ env:
   DIY_P1_SH: router/phicomm_n1/diy-part1.sh
   DIY_P2_SH: router/phicomm_n1/diy-part2.sh
   UPLOAD_BIN_DIR: false
+  UPLOAD_ARMVIRT: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
   UPLOAD_COWTRANSFER: false
-  UPLOAD_WETRANSFER: true
-  RECENT_LASTEST: 15
+  UPLOAD_WETRANSFER: false
+  RECENT_LASTEST: 3
   TZ: Asia/Shanghai
 
 jobs:
@@ -54,6 +55,7 @@ jobs:
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
+        echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
 
     - name: Clone source code
       working-directory: /workdir
@@ -125,7 +127,7 @@ jobs:
 
     - name: Organize armvirt files
       id: organize
-      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_ARMVIRT == 'true' && !cancelled()
       run: |
         cd openwrt/bin/targets/*/*
         rm -rf packages
@@ -134,7 +136,7 @@ jobs:
 
     - name: Upload armvirt directory to Actions
       uses: actions/upload-artifact@v2
-      if: steps.organize.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      if: steps.organize.outputs.status == 'success' && env.UPLOAD_ARMVIRT == 'true' && !cancelled()
       with:
         name: openwrt_armvirt_64_${{ env.FILE_DATE }}
         path: ${{ env.TMPFILEPATH }}
@@ -142,39 +144,27 @@ jobs:
         if-no-files-found: ignore
 
     - name: Build OpenWrt for Phicomm-N1
-      if: steps.organize.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       id: build
       run: |
         git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-openwrt.git
         cd amlogic-s9xxx-openwrt/
-        mkdir -p openwrt-armvirt
+        [ -d openwrt-armvirt ] || mkdir -p openwrt-armvirt
         cp -f ../openwrt/bin/targets/*/*/*.tar.gz openwrt-armvirt/ && sync
         sudo rm -rf ../openwrt && sync
         sudo rm -rf /workdir && sync
         sudo chmod +x make
-        sudo ./make -d -b n1 -k 5.9.16_5.4.86_5.9.14_5.4.83_5.4.50_5.7.7_5.7.15
+        sudo ./make -d -b s905d -k 5.10.26.TF_5.4.108_5.4.50_5.7.7_5.7.15
         cd out/ && sudo gzip *.img
         cp -f ../openwrt-armvirt/*.tar.gz . && sync
         echo "FILEPATH=$PWD" >> $GITHUB_ENV
         echo "::set-output name=status::success"
 
-    - name: Upload firmware directory for armvirt
-      uses: actions/upload-artifact@v2
+    - name: Upload artifact to Actions
+      uses: kittaakos/upload-artifact-as-is@master
       if: steps.build.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       with:
-        name: openwrt-armvirt-64-default-rootfs_${{ env.FILE_DATE }}
-        path: ${{ env.FILEPATH }}/openwrt-armvirt-64-*
-        retention-days: ${{ env.RECENT_LASTEST }}
-        if-no-files-found: ignore
-
-    - name: Upload firmware directory for Phicomm-N1
-      uses: actions/upload-artifact@v2
-      if: steps.build.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
-      with:
-        name: openwrt_phicomm-n1_${{ env.FILE_DATE }}
-        path: ${{ env.FILEPATH }}/openwrt_n1_*
-        retention-days: ${{ env.RECENT_LASTEST }}
-        if-no-files-found: ignore
+        path: ${{ env.FILEPATH }}/
 
     - name: Upload OpenWrt Firmware to cowtransfer
       if: steps.build.outputs.status == 'success' && env.UPLOAD_COWTRANSFER == 'true' && !cancelled()
@@ -187,7 +177,7 @@ jobs:
       if: steps.build.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
       run: |
         curl -fsSL git.io/file-transfer | sh
-        ./transfer wet -s -p 16 --no-progress ${{ env.FILEPATH }}/openwrt_s9xxx_* 2>&1 | tee wetransfer.log
+        ./transfer wet -s -p 16 --no-progress ${{ env.FILEPATH }} 2>&1 | tee wetransfer.log
         echo "WET_URL=$(cat wetransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_ENV
 
     - name: Upload OpenWrt Firmware to Release
@@ -206,6 +196,6 @@ jobs:
           Default password: password
           Default WIFI name: OpenWrt
           Default WIFI password: none
-          Installation command: n1-install.sh
-          [WETRANSFER](${{ env.WET_URL }})
+          Install command: openwrt-install
+          Update command: openwrt-update
 
